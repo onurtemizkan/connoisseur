@@ -4,18 +4,15 @@ const connoisseur = require("./lib/connoisseur");
 const fs = require("fs");
 const sourceFiles = require("yargs").argv._;
 
-const displayErrors = function (errors) {
-    let hasError = false;
-    errors.forEach(file => {
-        if (!file[1].length)
-            return;
+const fixIndentation = code => code.replace(/(\r\n|\n|\r)/gm, "\n\t");
 
-        hasError = true;
+const displayErrors = function (errors) {
+    errors.forEach(fileInfo => {
         /* eslint-disable no-console */
         console.log(
-            `Errors found for file ${file[0]}:\n${
-                file[1].reduce((prev, errorData) =>
-                    `${prev}\t${errorData.code.replace(/(\r\n|\n|\r)/gm, "\r\n\t")}\t${
+            `Errors found for file ${fileInfo.path}:\n${
+                fileInfo.errors.reduce((prev, errorData) =>
+                    `${prev}\t${fixIndentation(errorData.code)}\t${
                         errorData.error || `→ Expected: ${errorData.expected}, Found: ${errorData.actual}`
                     }\n`
                 , "")
@@ -23,10 +20,17 @@ const displayErrors = function (errors) {
         );
         /* eslint-enable no-console */
     });
-
-    return hasError;
 };
 
-const errors = sourceFiles.map(filepath => [filepath, connoisseur(fs.readFileSync(filepath, "utf8"))]);
+const errors = sourceFiles
+    .map(filePath => ({
+        path: filePath,
+        errors: connoisseur(fs.readFileSync(filePath, "utf8")),
+    }))
+    .filter(fileInfo => fileInfo.errors.length);
 
-process.exit(displayErrors(errors));
+const exitCode = errors.length > 0 ? 1 : 0;
+
+displayErrors(errors);
+
+process.exit(exitCode);
