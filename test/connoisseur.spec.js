@@ -41,7 +41,7 @@ describe("connoisseur", () => {
     });
 
     describe("stdin", () => {
-        it("should print no error message for plain javascript ", done => {
+        it("should print no error message for plain JavaScript", done => {
             const proc = spawn("node", ["./index.js"]);
             proc.stdin.write(`var a = "foo"${EOL}`);
             proc.stdout.on("data", data => {
@@ -51,7 +51,7 @@ describe("connoisseur", () => {
             proc.stdin.end();
         });
 
-        it("should print no error message for a valid javascript source with a valid connoisseur test", done => {
+        it("should print no error message for a valid JavaScript source with a valid connoisseur test", done => {
             const proc = spawn("node", ["./index.js"]);
             proc.stdin.write("[4, 9, 16].map(Math.sqrt);  // → [ 2, 3, 4 ]");
             proc.stdout.on("data", data => {
@@ -61,7 +61,7 @@ describe("connoisseur", () => {
             proc.stdin.end();
         });
 
-        it("should print errors for a valid javascript source with an invalid connoisseur test", done => {
+        it("should print errors for a valid JavaScript source with an invalid connoisseur test", done => {
             const proc = spawn("node", ["./index.js"]);
             proc.stdin.write("[4, 9, 16].map(Math.sqrt);  // → [ 1, 2, 3 ]");
             proc.stdout.on("data", data => {
